@@ -14,12 +14,15 @@
     <v-content>
       <v-container>
         <!-- Rendering buttons for all news categories -->
-        <v-text-field label="Search..." single-line outlined></v-text-field>
-        <div>
-          <v-btn-toggle class="d-flex justify-center align-center" text mandatory group>
-            <v-btn v-for="topic in newsTopics" :key="topic" @click="fetchData(topic)">{{topic}}</v-btn>
-          </v-btn-toggle>
-        </div>
+        <!-- <v-text-field label="Search..." single-line outlined></v-text-field> -->
+        <v-btn
+          class="col-4 my-1 deep-orange--text"
+          @click="fetchData(topic)"
+          v-for="topic in newsTopics"
+          :key="topic"
+          text
+          elevation="1"
+        >{{topic}}</v-btn>
 
         <!-- Render Article Cards -->
         <v-card
@@ -83,8 +86,12 @@ export default {
     ]
   }),
   methods: {
-    themeLight() {this.$vuetify.theme.dark = false},
-    themeDark() {this.$vuetify.theme.dark = true},
+    themeLight() {
+      this.$vuetify.theme.dark = false;
+    },
+    themeDark() {
+      this.$vuetify.theme.dark = true;
+    },
     fetchData(topic) {
       console.log(topic);
       let url = `https://api.nytimes.com/svc/topstories/v2/${topic}.json?api-key=${this.apiKey}`;
@@ -94,6 +101,6 @@ export default {
         this.articles = data;
       });
     }
-  },
+  }
 };
 </script>
