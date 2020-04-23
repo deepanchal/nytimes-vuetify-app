@@ -61,11 +61,11 @@
           >
             <v-chip class="my-2 mx-2">{{article.section.toUpperCase()}}</v-chip>
           </v-img>
-          <v-card-title>{{article.title}}</v-card-title>
-          <v-card-subtitle>{{article.byline}}</v-card-subtitle>
+          <v-card-title style="wordBreak: normal">{{article.title}}</v-card-title>
+          <v-card-subtitle style="wordBreak: normal">{{article.byline}}</v-card-subtitle>
 
           <v-card-text>
-            <div>{{article.abstract}}</div>
+            <div style="wordBreak: normal">{{article.abstract}}</div>
           </v-card-text>
 
           <v-card-actions>
