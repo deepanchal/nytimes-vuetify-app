@@ -3,9 +3,14 @@
     <!-- Navigation menu -->
     <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" app>
       <v-list dense nav>
-        <v-list-item-group active-class="light-blue--text text--accent-4">
-          <v-list-item v-for="(topic, index) in newsTopics" :key="index" link>
-            <v-list-item-content @click="loading=true;fetchData(topic);drawer=false;">
+        <v-list-item-group active-class="orange--text text--accent-4">
+          <v-list-item
+            @click="loading=true;fetchData(topic);drawer=false;"
+            v-for="(topic, index) in newsTopics"
+            :key="index"
+            link
+          >
+            <v-list-item-content>
               <v-list-item-title>{{topic.toUpperCase()}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -13,7 +18,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app color="amber darken-2" :clipped-left="$vuetify.breakpoint.lgAndUp">
+    <v-app-bar app color="cyan darken-2" dark :clipped-left="$vuetify.breakpoint.lgAndUp">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
         <span>Newsify</span>
@@ -41,14 +46,30 @@
         :indeterminate="loading"
         absolute
         bottom
-        color="light-blue"
+        color="orange"
       ></v-progress-linear>
     </v-app-bar>
 
     <v-content>
       <v-container>
-        <h1 v-for="(article, index) in searchedArticles" :key="index">{{article.abstract}}</h1>
         <!-- Render Article Cards -->
+        <v-card
+          v-for="(article, index) in searchedArticles"
+          :key="index"
+          class="mx-auto my-4"
+          max-width="400"
+          hover
+        >
+          <Article
+            :section="article.section_name"
+            :mediaImg="article['multimedia'].length === 0 ? 'https://static01.nyt.com/vi-assets/images/share/1200x675_nameplate.png' : 'https://nytimes.com/' + article['multimedia'][0].url"
+            :title="article.headline.main"
+            :author="article.byline.original"
+            :url="article.web_url"
+            :abstract="article.abstract"
+          ></Article>
+        </v-card>
+
         <v-card
           v-for="(article, index) in articles"
           :key="index"
@@ -56,26 +77,14 @@
           max-width="400"
           hover
         >
-          <v-img
-            class="white--text align-end"
-            height="230px"
-            :src="article['multimedia'][0]['url']"
-          >
-            <v-chip class="my-2 mx-2">{{article.section.toUpperCase()}}</v-chip>
-          </v-img>
-          <v-card-title style="wordBreak: normal">{{article.title}}</v-card-title>
-          <v-card-subtitle style="wordBreak: normal">{{article.byline}}</v-card-subtitle>
-
-          <v-card-text>
-            <div style="wordBreak: normal">{{article.abstract}}</div>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn color="light-blue text--accent-4" :href="article.url" target="_blank" text block>
-              View article
-              <v-icon right>mdi-open-in-new</v-icon>
-            </v-btn>
-          </v-card-actions>
+          <Article
+            :section="article.section"
+            :mediaImg="article['multimedia'][0]['url']"
+            :title="article.title"
+            :author="article.byline"
+            :url="article.url"
+            :abstract="article.abstract"
+          ></Article>
         </v-card>
       </v-container>
     </v-content>
@@ -83,10 +92,11 @@
 </template>
 
 <script>
+import Article from "./Article";
 export default {
   name: "App",
 
-  components: {},
+  components: { Article },
 
   data: () => ({
     drawer: null,
@@ -120,26 +130,17 @@ export default {
     },
     fetchData(topic) {
       this.searchedArticles = "";
-      console.log(topic);
       let url = `https://api.nytimes.com/svc/topstories/v2/${topic}.json?api-key=${process.env.VUE_APP_APIKEY}`;
       this.$axios.get(url).then(response => {
         this.articles = response.data.results;
-        console.log(this.articles[0]["multimedia"][0]["url"]);
-        console.log(this.articles[0]["title"]);
-        console.log(this.articles[0]["byline"]);
-        console.log(this.articles[0]["url"]);
-        console.log(this.articles[0]["section"]);
-        console.log(this.articles[0]["abstract"]);
         this.loading = false;
       });
     },
     fetchSearchQuery(query) {
       this.articles = "";
-      console.log(query);
-      let url = `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${query}&api-key=${process.env.VUE_APP_APIKEY}`;
+      let url = `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${query}?&api-key=${process.env.VUE_APP_APIKEY}`;
       this.$axios.get(url).then(response => {
         this.searchedArticles = response.data.response.docs;
-        console.log(this.searchedArticles);
         this.loading = false;
       });
     }
