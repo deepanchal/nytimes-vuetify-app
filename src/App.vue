@@ -13,10 +13,10 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app color="amber" :clipped-left="$vuetify.breakpoint.lgAndUp">
+    <v-app-bar app color="amber darken-2" :clipped-left="$vuetify.breakpoint.lgAndUp">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title style="width: 300px" class="ml-0 pl-4">
-        <span class="hidden-sm-and-down">NyTimes News Fetcher</span>
+        <span>Newsify</span>
       </v-toolbar-title>
       <v-text-field
         flat
@@ -25,6 +25,7 @@
         prepend-inner-icon="mdi-magnify"
         label="Search"
         class="hidden-sm-and-down"
+        @change="loading=true;fetchSearchQuery($event)"
       />
       <v-spacer></v-spacer>
       <v-btn-toggle mandatory group>
@@ -46,6 +47,7 @@
 
     <v-content>
       <v-container>
+        <h1 v-for="(article, index) in searchedArticles" :key="index">{{article.abstract}}</h1>
         <!-- Render Article Cards -->
         <v-card
           v-for="(article, index) in articles"
@@ -75,7 +77,6 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <!-- ----------------------------------------------------------------------- -->
       </v-container>
     </v-content>
   </v-app>
@@ -91,6 +92,7 @@ export default {
     drawer: null,
     loading: false,
     articles: "",
+    searchedArticles: "",
     newsTopics: [
       "arts",
       "business",
@@ -117,6 +119,7 @@ export default {
       this.$vuetify.theme.dark = true;
     },
     fetchData(topic) {
+      this.searchedArticles = "";
       console.log(topic);
       let url = `https://api.nytimes.com/svc/topstories/v2/${topic}.json?api-key=${process.env.VUE_APP_APIKEY}`;
       this.$axios.get(url).then(response => {
@@ -129,7 +132,17 @@ export default {
         console.log(this.articles[0]["abstract"]);
         this.loading = false;
       });
+    },
+    fetchSearchQuery(query) {
+      this.articles = "";
+      console.log(query);
+      let url = `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${query}&api-key=${process.env.VUE_APP_APIKEY}`;
+      this.$axios.get(url).then(response => {
+        this.searchedArticles = response.data.response.docs;
+        console.log(this.searchedArticles);
+        this.loading = false;
+      });
     }
-  },
+  }
 };
 </script>
